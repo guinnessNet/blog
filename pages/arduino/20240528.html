@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Include Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>Document</title>
+</head>
+<body class="bg-gray-100">
+    <h1 class="text-4xl font-bold text-center mt-8">아두이노 연결</h1>
+
+    <div class="max-w-md mx-auto mt-16 p-4 bg-gray-100 rounded-lg shadow-md">
+        
+        <p class="text-gray-600"> ## 아두이노 연결
+            </br>- 1번모듈 메인모터 PUL 7번 DIR 6번
+            </br>- 1번모튤 뚜껑모터 PUL 5번 DIR 4번
+            </br>- 1번모듈 근접센서 8번
+            </br>
+            </br>주의사항 메인모터는 1암페어
+            </br>
+            </br>### 근접센서연결
+            </br>
+            </br>센서의 출력부분방향을 위에놓고 11시방향에서부터
+            </br>
+            </br>10시방향 GND
+            </br>2시방향 220옴저항- 아두이노5v
+            </br>4시방향 GND
+            </br>8시방향 8번인풋핀, 10A 저항-아두이노5v
+            </br>
+            </br>
+            </br>
+            </br>## 스텝모터 연결
+            </br>
+            </br>### TB6600
+            </br>
+            </br>| B- B+ A- A+
+            </br>검 녹  빨  파
+            </br>
+            </br>|TB6600|B-|B+|A-|A+|
+            </br>|------|---|---|---|---|
+            </br>|녹칸다|검|녹|빨|파|
+            </br>|강재현|빨|검|파|녹|
+            </br>|점퍼케이블|보|파|녹|회|
+            </br>
+            </br>
+            </br>- DIR-와 PUL-는 아두이노의 GND에
+            </br>- DIR+는 방향을 결정 아두이노의 6번핀
+            </br>- PUL+는 펄스를 결정 아두이노의 7번핀
+            </p>
+    </div>
+</div>
+</body>
+</html>

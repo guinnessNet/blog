@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Include Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>Document</title>
+</head>
+<body class="bg-gray-100">
+    <h1 class="text-4xl font-bold text-center mt-8">디바운스 구현</h1>
+
+    <div class="max-w-md mx-auto mt-8 p-4 bg-white rounded-lg shadow-md">
+        <p class="text-white bg-black">
+            // if(reading != lastButtonState){<br>
+            //   // Serial.println("changed");<br>
+            //   lastDebounceTime = millis();<br>
+            // }
+        </p>
+        <p class="text-white bg-black">
+            // if((millis() -  lastDebounceTime) > debounceDelay){<br>
+            //   if (reading != buttonState){<br>
+            //     Serial.print(reading);<br>
+            //     Serial.print(", ");<br>
+            //     Serial.print(buttonState);<br>
+            //     Serial.print(", ");<br>
+            //     Serial.println(lastButtonState);<br>
+            //     buttonState = reading;<br>
+            //     if (buttonState == HIGH){<br>
+            //       buttonPressed(); // Call the function when the button is pressed<br>
+            //     }<br>
+            //   }<br>
+            // }<br>
+        </p>
+    <div class="max-w-md mx-auto mt-16 p-4 bg-gray-100 rounded-lg shadow-md">
+        
+        <p class="text-gray-600"> 전역변수로 lastDebounceTime을 선언하고 버튼을 누를때의 시간을 저장한다음
+         const로 설정되어있는 debounceDelay와 비교해서 더 큰 경우에 버튼이 눌린것으로 인식
+        // 노이즈로 너무 짧게 인식되는것을 막음
+         버튼의 상태를 다시 buttonState로 저장하고
+        바뀐 상태가 HIGH일때 함수를 실행시킴</p>
+    </div>
+</div>
+</body>
+</html>

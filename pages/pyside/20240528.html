@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Include Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>Document</title>
+</head>
+<body class="bg-gray-100">
+    <h1 class="text-4xl font-bold text-center mt-8">디바운스 구현</h1>
+
+    <div class="max-w-md mx-auto mt-8 p-4 bg-white rounded-lg shadow-md">
+        <p class="text-white bg-black">
+            <pre>
+            <code>
+            import sys
+            import random
+            from PySide6 import QtCore, QtWidgets, QtGui
+            import serial
+            import serial.tools.list_ports
+
+            # 1번모듈 메인모터 PUL 7번 DIR 6번
+            # 1번모튤 뚜껑모터 PUL 5번 DIR 4번
+            # 1번모듈 근접센서 3번 2번
+
+            class MyWidget(QtWidgets.QWidget):
+                class Motor(QtWidgets.QWidget): ##각각의모듈의 회전수를 제어하고 전송하는 클래스
+                    def __init__(self,num, outer_instance):
+                        super().__init__()
+                        self.outer = outer_instance
+                        self.num = num;
+
+                        self.rotate_label = QtWidgets.QLabel("회전수:")
+                        self.rotate_input = QtWidgets.QLineEdit()
+                        self.send_btn = QtWidgets.QPushButton("Send")
+
+                        self.layout = QtWidgets.QVBoxLayout(self)
+                        # self.layout.setFontSize(20)
+                        label = QtWidgets.QLabel(f'{num} 번 모듈')
+                        font = label.font()
+                        font.setPointSize(20)
+                        label.setFont(font)
+                        self.layout.addWidget(label)
+                        self.layout.addWidget(self.rotate_label)
+                        self.layout.addWidget(self.rotate_input)
+                        self.layout.addWidget(self.send_btn)
+
+                        self.send_btn.clicked.connect(self.on_click_send)
+
+                    def on_click_send(self):
+                        ratate = self.rotate_input.text()
+                        print(f"Module Number : {self.num}")
+                        print(f"rotation : {ratate}")
+                        if isinstance(self.outer.arduino, serial.Serial):
+                            print("sended")
+                            # self.outer.arduino.write(f'{self.num},{ratate}'.encode())
+                            self.outer.arduino.write(f'{ratate}'.encode())
+                        #이 명령을 보내면 아두이노에서 해당모듈의 모터를 돌린다.(하단부분은 아두이노에서 구현)
+                        #1. 뚜껑 모터를 회전시킨다.
+                        #2. 스크류 모터를 회전수에 맞게 회전시킨다.
+                        #3. 뚜껑 모터를 원래대로 복구시킨다.
+                        #4. 센서값을 읽어서 초기화 되지 않으면 3으로 돌아간다
+                        #5. 초기화가 되면 작동완료로 화면에 표시한다.
+              
+                def __init__(self):
+                    super().__init__()
+
+                    self.PORT = ""
+                    self.BAUD_RATE = 9600
+                    
+                    # self.arduino = serial.Serial(self.PORT , self.BAUD_RATE, timeout=0.1)
+
+                    # self.hello = ["Hallo Welt", "Hei maailma", "Hola Mundo", "Привет мир"]
+                    self.layout = QtWidgets.QVBoxLayout(self)
+
+                    self.setuplayout = QtWidgets.QHBoxLayout(self)
+
+                    self.connect_button = QtWidgets.QPushButton("설정")
+                    # self.send_button = QtWidgets.QPushButton("전송")
+                    # self.text = QtWidgets.QLabel("Hello World",
+                    #                              alignment=QtCore.Qt.AlignCenter)
+
+
+                    self.combo_box = self.ports()
+                    self.baud_rate_label = QtWidgets.QLabel("Baud Rate:")
+                    self.baud_box = self.baud_rate()
+
+                    # self.speed_label = QtWidgets.QLabel("Speed:")
+                    # self.speed_input = QtWidgets.QLineEdit()
+                    # self.duration_label = QtWidgets.QLabel("Duration(ms):")
+                    # self.duration_input = QtWidgets.QLineEdit()
+                    
+
+                    self.setuplayout.addWidget(self.combo_box)
+                    self.setuplayout.addWidget(self.baud_rate_label)
+                    self.setuplayout.addWidget(self.baud_box)
+                    self.setuplayout.addWidget(self.connect_button)
+                    self.layout.addLayout(self.setuplayout)
+                    # self.layout.addWidget(self.speed_label)
+                    # self.layout.addWidget(self.speed_input)
+                    # self.layout.addWidget(self.duration_label)
+                    # self.layout.addWidget(self.duration_input)
+                    # self.layout.addWidget(self.send_button)
+
+                    self.boxlayout = QtWidgets.QHBoxLayout(self)
+                    self.boxlayout.addWidget(self.Motor(1, self))
+                    self.boxlayout.addWidget(self.Motor(2, self))
+                    self.boxlayout.addWidget(self.Motor(3, self))
+
+                    self.layout.addLayout(self.boxlayout)
+
+
+                    # self.layout.addWidget(self.baud_box)
+
+                    self.connect_button.clicked.connect(self.on_click_button)
+                    # self.send_button.clicked.connect(self.speed_button)
+                    self.combo_box.currentIndexChanged.connect(self.print_selection)
+                    self.baud_box.currentIndexChanged.connect(self.rate_selection)
+
+                @QtCore.Slot()
+                def ports(self):
+                    # self.text.setText(random.choice(self.hello))
+
+                    # Get the list of currently connected serial connections
+                    ports = serial.tools.list_ports.comports()
+                    port_names = [port.device for port in ports]
+
+                    self.PORT = port_names[0]
+
+                    # Create a combo box to display the list of serial connections
+                    combo_box = QtWidgets.QComboBox()
+                    combo_box.addItems(port_names)
+
+                    return combo_box  # QComboBox 위젯 반환
+                
+                def print_selection(self):
+                    selected_port = self.combo_box.currentText()
+                    self.PORT = selected_port
+                    print(f"Selected port: {selected_port}")
+
+                def baud_rate(self):
+                    # baud_rate_label = QtWidgets.QLabel("Baud Rate:")
+                    baud_rate_combo_box = QtWidgets.QComboBox()
+                    baud_rate_combo_box.addItems(["9600", "115200", "230400"])  # Add your desired baud rates here
+
+                    return baud_rate_combo_box
+                    
+                def rate_selection(self):
+                    selected_rate = self.baud_box.currentText()
+                    self.BAUD_RATE = selected_rate
+                    print(f"Selected Rate: {selected_rate}")
+
+                def on_click_button(self):
+                    print(f"Selected port: {self.PORT}")
+                    print(f"Selected baud rate: {self.BAUD_RATE}")
+                    self.arduino = serial.Serial(self.PORT , self.BAUD_RATE, timeout=0.1)
+
+                def send_to_arduino(self):
+                    pass
+
+
+            if __name__ == "__main__":
+                app = QtWidgets.QApplication([])
+
+                widget = MyWidget()
+                widget.resize(600, 200)
+                widget.show()
+
+                sys.exit(app.exec())
+            </code>
+            </pre>
+        </p>
+
+    <div class="max-w-md mx-auto mt-16 p-4 bg-gray-100 rounded-lg shadow-md">
+        
+        <p class="text-gray-600"> 시리얼통신을 통해서 값을 아두이노로 전달하고 각종설정값을 변경할 수 있도록 함</p>
+    </div>
+</div>
+</body>
+</html>
